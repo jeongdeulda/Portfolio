@@ -1,0 +1,1803 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <style>
+    :root{
+      --thumb-w:180px;
+      --thumb-h:80px;
+      --header-h:120px;
+      --bg:#FFFFFF;
+      --accent: #35FFA1;
+      --text-color: #4E4D4D;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body,html{height:100%;font-family:'Pretendard', sans-serif;background:var(--bg); overflow: hidden;cursor: url('mouse.png') 16 16, auto;}
+
+    /* Topbar 설정 */
+    .topbar{
+      height:var(--header-h);
+      display:flex;
+      flex-direction: column;
+      align-items: flex-start; 
+      justify-content: flex-start;
+      overflow:visible;        
+      position: absolute; 
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 0 15px;
+    }
+
+    .topbar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: rgba(255, 255, 255, 0.2); 
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .thumb-row{display:flex;align-items: flex-end;}
+
+    .thumb{
+      width:var(--thumb-w);
+      height:var(--thumb-h);
+      flex:0 0 auto;
+      background:#eee;
+      border:0px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor: url('mouse2.png') 16 16, pointer;
+      user-select: none;
+      position: relative;
+      transition: opacity 0.1s ease;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: auto;
+    }
+    .thumb.active, .thumb.visible {opacity: 1; pointer-events: auto;} 
+
+    .thumb::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    /* 썸네일 이미지 설정 */
+    .thumb:nth-child(1)::before { background-image: url('thumb/thumb1.jpg'); }
+    .thumb:nth-child(2)::before { background-image: url('thumb/thumb2.jpg'); }
+    .thumb:nth-child(3)::before { background-image: url('thumb/thumb3.jpg'); }
+    .thumb:nth-child(4)::before { background-image: url('thumb/thumb4.jpg'); }
+    .thumb:nth-child(5)::before { background-image: url('thumb/thumb5.jpg'); }
+    .thumb:nth-child(6)::before { background-image: url('thumb/thumb6.jpg'); }
+    .thumb:nth-child(7)::before { background-image: url('thumb/thumb7.jpg'); }
+    .thumb:nth-child(8)::before { background-image: url('thumb/thumb8.jpg'); }
+
+    .thumb:hover .label{opacity: 1;}
+    .thumb:hover::before{opacity: 1;}
+    .thumb:hover{background-color: #f0f0f0;}
+
+    .side-buttons{display:flex; position: absolute; top: 0; right: 15px; margin-left: auto; margin-right: 0px; margin-top: 0px; align-items:center; flex-direction: row; height: var(--header-h);}
+    .side-btn{
+      min-width:150px; 
+      height:30px; 
+      border:0px solid #999; 
+      background:transparent;
+      cursor: url('mouse2.png') 16 16, pointer;
+      display:flex; align-items:center; 
+      justify-content:flex-end; 
+      padding-left: 0px; padding-right: 0px; padding-top: 0; font-weight:400;font-size:17px; color: #878787; opacity: 1; margin-top: 70px; margin-bottom: 0;
+      background: transparent;
+    }
+    .side-btn:hover{background: transparent; color: #35FFA1}
+    .side-btn.active{background:transparent; color: #35FFA1;}
+
+
+    /* Tool Skill 스타일 */
+    .tool-box {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    .tool-title {
+      font-size: 20px;
+      font-weight: 300;
+      color: #35ffa1;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .tool-item {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      font-size: 20px;
+      font-weight: 250;
+      color: var(--text-color);
+    }
+
+    .tool-name {
+      width: 220px;
+      margin-right: 20px;
+      padding-right: 0;
+    }
+
+    .progress-bar {
+      width: 120px;
+      height: 8px;
+      border: 1px solid #999999;
+      position: relative;
+      background: transparent;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #35ffa1;
+      width: 0%;
+      transition: width 1s ease-out;
+    }
+
+
+    .content-wrap{ height: 100vh; overflow:hidden; }
+    .page{
+      height:100%;
+      overflow-y:auto;
+      overflow-x: hidden;
+      padding: var(--header-h) 15px 15px 15px; 
+      display:none;
+      background:#FFFFFF;
+    }
+    .page.active{display:block}
+    
+    /* 스크롤 잠금용 클래스 */
+    .page.locked { overflow: hidden !important; }
+
+    #video-container { padding: 0 !important; text-align: left !important; aspect-ratio: 1639 / 730; height: auto !important; position: relative; }
+    #hero-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; cursor: url('mouse2.png') 16 16, pointer; }
+
+    .keywords { display: flex; margin-top: 5px; margin-bottom: 5px; margin-left: 0; justify-content: left; font-size: 17px; font-weight: 300; color: #878787; padding-left: 0; }
+    .keywords span{ margin-right: 230px; position: relative; cursor: url('mouse2.png') 16 16, pointer; display: inline-block; height: auto; transition: color 0.2s ease;}
+    .keywords span::before{ content: ""; position: absolute; top: -10px; bottom: -10px; left: -10px; right: -10px; }
+    .keywords span:hover { color: #222;}
+    .keywords span:last-child {margin-right: 0;}
+
+    @keyframes float {
+        0% { transform: translate(-50%, -50%) translateY(0); }
+        50% { transform: translate(-50%, -50%) translateY(-20px); }
+        100% { transform: translate(-50%, -50%) translateY(0); }
+    }
+
+    .project-detail-3col {
+      display: grid;
+      grid-template-columns: 4fr 3fr 3fr; 
+      gap: 15px; 
+      width: 100%;
+      max-width: 100%;
+      margin: 0px 0px 200px 0px;
+      padding: 0;
+      align-items: start; 
+    }
+
+    .p1-img-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0; 
+    }
+    .p1-img-stack img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #eee; 
+    }
+
+    /* --- Project 1 : Hover Video Style (Landscape) --- */
+    .p1-hover-media {
+        width: 100%;
+        max-width: 1200px; /* 기존 Project 1 이미지 크기와 동일 */
+        margin: 50px auto; /* 중앙 정렬 */
+        position: relative;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    /* 기본 이미지 */
+    .p1-hover-media img {
+        width: 100%;
+        height: auto;
+        display: block;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* 호버 시 나올 비디오 (숨김 상태) */
+    .p1-hover-media video {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        object-fit: cover;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* 호버 시 비디오 보이기 */
+    .p1-hover-media:hover video {
+        opacity: 1;
+    }
+
+    .click-hint {
+      position: fixed;
+        top: 0; 
+        left: 0;
+
+      font-size:30px;      /* 크기 (컨테이너가 커서 폰트도 커야 잘 보입니다) */
+      font-weight: 100;     /* 요청하신 얇은 굵기 */
+      color: #000000;       /* 검은색 */
+      font-family: 'Pretendard', sans-serif;
+      
+      opacity: 0;          
+      transition: opacity 0.2s ease;
+      pointer-events: none; /* 중요: 마우스 이벤트를 통과시켜서 뒤쪽 커서/클릭 기능 유지 */
+      z-index: 9999;
+      white-space: nowrap;
+    }
+
+    /* 스티커에 호버 시 텍스트 보이기 */
+    #sticker:hover .click-hint {
+      opacity: 1;
+    }
+
+    .p1-text-col {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      color: var(--text-color);
+      font-size: 39px;
+      font-weight: 150;
+      line-height: 1.5;
+      padding-top: 0px
+    }
+
+    .highlight-green {
+      color: var(--accent);
+      font-size: 39px;
+      font-weight: 200;
+      line-height: 1.3;
+      margin-bottom: 30px;
+      margin-top: -10px;
+      display: block;
+    }
+
+    .word-highlight {
+      color: var(--accent);
+      font-weight: 190;
+      position: relative;
+      cursor: url('mouse2.png') 16 16, pointer;
+      display: inline-block;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transform: translateZ(0); 
+      backface-visibility: hidden;
+    }
+
+    .word-highlight::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 100%;
+      bottom: auto;
+      left: 50px;
+      transform: none;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.2); 
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--accent);
+      font-size: 24px;
+      font-weight: 200;
+      padding: 10px 15px;
+      border-radius: 8px;
+      white-space: pre;
+      text-align: left;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .word-highlight:hover::after {
+      opacity: 1;
+      visibility: visible;
+      margin-top: 0px;
+    }
+
+    /* =========================================
+       ⭐ 마인드맵 스타일
+       ========================================= */
+    .mindmap-section {
+        width: 100%;
+        margin-top: 100px;
+        margin-bottom: 150px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+
+    .mindmap-svg {
+        width: 100%;
+        max-width: 1200px; 
+        height: auto;
+        overflow: visible; 
+    }
+
+    /* 1. 트리거 레이어 (투명한 히트 영역) */
+    .center-node-trigger-group {
+        cursor: url('mouse2.png') 16 16, pointer;
+        fill: transparent; /* 눈에 보이지 않음 */
+    }
+    
+    /* 3. 비주얼 레이어 (실제 보이는 원과 텍스트) */
+    .center-node-visual-group {
+        pointer-events: none; /* 마우스 이벤트 통과 */
+    }
+
+    .visual-circle {
+        fill: var(--accent);
+        transition: transform 0.3s ease;
+    }
+
+    .center-node-text {
+        fill: #fff;
+        font-size: 28px;
+        font-weight: 400;
+        text-anchor: middle;
+        dominant-baseline: middle;
+    }
+    
+    /* 트리거 호버 시 -> 비주얼 원 커짐 */
+    .center-node-trigger-group:hover ~ .center-node-visual-group .visual-circle {
+        transform: scale(1.05);
+    }
+
+    /* 연결선 스타일 */
+    .mindmap-path {
+        fill: none;
+        stroke: var(--accent); /* 선 색상을 연두색으로 변경 (이미지 참고) */
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 2000; 
+        stroke-dashoffset: 2000;
+        transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    /* 잎 노드: 점 (Dot) 스타일 */
+    .leaf-node-dot {
+        fill: var(--accent); /* 연두색 채움 */
+        stroke: none;
+    }
+
+    /* 잎 노드: 텍스트 스타일 */
+    .leaf-node-text {
+        fill: #666; /* 글자색: 진한 회색 */
+        font-size: 16px; /* 폰트 크기 조정 */
+        font-weight: 300; /* 얇은 폰트 (Pretendard Light) */
+        dominant-baseline: middle; /* 수직 중앙 정렬 */
+        /* text-anchor는 HTML 태그에서 개별 설정 (start/end) */
+    }
+
+    /* 노드 그룹 애니메이션 (마우스 뗐을 때 즉시 사라짐) */
+    .leaf-node-group {
+        opacity: 0;
+        transition: opacity 0.2s ease 0s !important; 
+    }
+
+    /* 호버 인터랙션 (마우스 올렸을 때 순서대로 나타남) */
+    .center-node-trigger-group:hover ~ .branch-group .mindmap-path {
+        stroke-dashoffset: 0; 
+    }
+    .center-node-trigger-group:hover ~ .branch-group .leaf-node-group {
+        opacity: 1; 
+        transition: opacity 0.4s ease;
+    }
+
+    /* --- 프로젝트 비디오 섹션 스타일 --- */
+    .video-section {
+      width: 100%;
+      margin-top: 10px;     /* 이미지와의 간격 */
+      margin-bottom: 100px; /* 세트 간 간격 (조절 가능) */
+      display: flex;
+      justify-content: center; /* 중앙 정렬 */
+      padding: 0 15px;      /* 모바일 양옆 여백 */
+    }
+
+    .project-video {
+      width: 100%;
+      max-width: 1200px;    /* 마인드맵과 동일한 최대 너비 */
+      height: auto;
+      display: block;
+      /* 그림자 효과 */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+    }
+
+    /* --- 이미지 섹션 스타일 --- */
+    .image-section {
+      width: 100%;
+      margin-top: 50px;     /* 마인드맵과의 간격 */
+      display: flex;
+      justify-content: center; /* 중앙 정렬 */
+      padding: 0 15px;
+    }
+
+    .project-image {
+      width: 100%;
+      max-width: 1200px;    /* 영상과 동일한 최대 너비 */
+      height: auto;
+      display: block;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* 영상과 동일한 그림자 */
+    }
+
+    /* --- Project 2 전용 스타일 (Sticky Scroll) --- */
+    /* 1. 스크롤 트랙 */
+    .p2-track {
+      height: 400vh; 
+      position: relative;
+    }
+
+    /* 2. 스티키 컨테이너 */
+    .p2-sticky-container {
+      position: sticky;
+      top: 0;
+      height: 100vh; 
+      display: flex;
+      align-items: flex-start; /* 상단 정렬 */
+      padding-top: var(--header-h); /* 헤더만큼 여백 */
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* 3. 이미지 창 */
+    .p2-img-window {
+      width: 100%;
+      height: calc(80vh + 150px); /* 높이 조정 */
+      overflow: hidden; 
+      position: relative;
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+
+    /* 4. 실제 긴 이미지 */
+    #p2-long-image {
+      width: 100%;
+      height: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: transform; 
+    }
+
+    /* Project 2 페이지의 기본 상단 패딩 제거 */
+    #project2 {
+      padding-top: 0 !important;
+    }
+
+/* --- [수정됨] Project 2 : Scene Gallery --- */
+    .scene-gallery {
+      width: 100%;
+      margin-top: 10px;     /* 상단 여백만 유지 */
+      display: flex;
+      flex-direction: column;
+      gap: 10px; 
+      padding: 0;           /* 패딩 제거 (그리드 패딩 사용) */
+    }
+
+    .scene-item {
+      position: relative;
+      width: 100%;
+      /* max-width: 600px; <-- [삭제] 꽉 차게 변경 */
+      aspect-ratio: 1328 / 2360; 
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      /* margin: 0 auto;   <-- [삭제] */
+    }
+
+    /* 이미지와 비디오 공통 스타일 */
+    .scene-visual {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 이미지는 기본적으로 보임 */
+    .scene-img {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 비디오는 이미지 위에 겹쳐서 투명하게 숨김 */
+    .scene-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      opacity: 0; /* 평소엔 안 보임 */
+      transition: opacity 0.3s ease; /* 부드럽게 나타남 */
+    }
+
+    /* 호버 시 비디오 보이기 */
+    .scene-item:hover .scene-video {
+      opacity: 1;
+    }
+
+    /* ... (기존 미디어 쿼리 내용) ... */
+    @media (max-width:1024px){
+      .project-detail-3col {
+        grid-template-columns: 1fr;
+        gap: 60px;
+      }
+      .mindmap-svg {
+          min-height: 600px;
+      }
+    } /* <--- [중요] 미디어 쿼리 닫는 괄호 뒤에 작성해야 PC에서도 보입니다 */
+
+    /* ▼▼▼ [수정됨] Project 3 하단 이미지 스타일 (미디어 쿼리 밖으로 이동) ▼▼▼ */
+    .p3-wide-image-container {
+      width: 100%;
+      margin-top: 120px;    /* 위쪽 그리드와의 간격 */
+      margin-bottom: 80px;  /* 아래쪽 이미지와의 간격 */
+      display: flex;
+      justify-content: center;
+    }
+
+    .p3-wide-image-container img {
+      width: 100%;
+      max-width: 1100px;    /* 최대 너비 제한 */
+      height: auto;
+      display: block;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .p3-square-image-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 400px;
+    }
+
+    .p3-square-image-container img {
+      width: 100%;
+      max-width: 500px;     /* 정사각형 이미지 크기 제한 */
+      height: auto;
+      display: block;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    /* --- Project 3 : 8 Grid & Center Video --- */
+    .p3-grid-container {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 가로 4개 */
+      gap: 10px; /* 사이 간격 */
+      margin-top: 50px;
+      margin-bottom: 80px; /* 9번 이미지와의 간격 */
+    }
+
+    .p3-grid-item {
+      width: 100%;
+      height: auto;
+    }
+
+    .p3-grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    /* Scene 9 : 중앙 정렬 및 호버 비디오 */
+    .p3-center-media {
+      width: 100%;
+      max-width: 1639px; /* 요청하신 원본 비율 유지 */
+      aspect-ratio: 1639 / 830; /* 비율 고정 */
+      margin: 0 auto 150px auto; /* 중앙 정렬 및 하단 여백 */
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .p3-center-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .p3-center-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      opacity: 0; /* 평소엔 숨김 */
+      transition: opacity 0.3s ease;
+    }
+
+    /* 호버 시 비디오 보이기 */
+    .p3-center-media:hover video {
+      opacity: 1;
+    }
+
+    /* 모바일 대응: 4열 -> 2열로 변경 (선택사항) */
+    @media (max-width: 768px) {
+      .p3-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* --- Project 4 : Image Swapping Style --- */
+    
+    /* 1. 중앙 긴 이미지 (bomb.png) 컨테이너 */
+    .p4-tall-image-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 100px;
+      margin-bottom: 100px;
+    }
+
+    .p4-tall-image-container img {
+      width: 100%;
+      max-width: 500px; /* 너무 커지지 않도록 적절히 제한 (원본 비율 유지) */
+      height: auto;
+      display: block;
+    }
+
+    /* 2. 하단 4열 이미지 그리드 */
+    .p4-grid-container {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 4등분 */
+      gap: 10px; /* 사이 간격 */
+      margin-bottom: 100px;
+    }
+
+    /* 3. 호버 시 이미지 교체(Swap) 아이템 설정 */
+    .p4-swap-item {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1368 / 2248; /* 요청하신 이미지 비율 고정 */
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .p4-swap-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: opacity 0.4s ease; /* 부드러운 전환 효과 */
+    }
+
+    /* 기본적으로 보이는 이미지 (bomb1~4) */
+    .img-front {
+      z-index: 10;
+      opacity: 1;
+    }
+
+    /* 호버 시 나올 이미지 (Bathbomb~) : 평소엔 투명 */
+    .img-back {
+      z-index: 20;
+      opacity: 0;
+    }
+
+    /* 마우스 올리면 뒤쪽 이미지 불투명도 100% */
+    .p4-swap-item:hover .img-back {
+      opacity: 1;
+    }
+
+    /* 모바일 대응 (2열로 변경) */
+    @media (max-width: 768px) {
+      .p4-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* --- Project 5 : Landscape Media Styles --- */
+
+    /* 1920x1080 비율(16:9) 컨테이너 공통 스타일 */
+    .p5-media-container {
+      width: 100%;
+      max-width: 1600px; /* 요청하신 원본 크기까지 허용 */
+      aspect-ratio: 16 / 9; /* 1920x1080 비율 고정 */
+      margin: 100px auto;   /* 위아래 간격 */
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .p5-media-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: absolute; /* 겹치기 위해 절대 위치 */
+      top: 0;
+      left: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    /* --- [1] 이미지 스왑 (Sketch -> Final) --- */
+    /* 기본적으로 보이는 이미지 (front) */
+    .p5-media-container .img-front {
+      z-index: 10;
+      opacity: 1;
+    }
+    /* 호버 시 나올 이미지 (back) */
+    .p5-media-container .img-back {
+      z-index: 20;
+      opacity: 0;
+    }
+    /* 호버 작동 */
+    .p5-media-container:hover .img-back {
+      opacity: 1;
+    }
+
+    /* --- [2] 비디오 호버 (Stop -> Move) --- */
+    .p5-media-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 30; /* 이미지보다 위에 배치 */
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    /* 호버 작동 */
+    .p5-media-container:hover video {
+      opacity: 1;
+    }
+
+    /* --- Project 6 : Vertical Media Styles (728x1030) --- */
+
+    .p6-media-container {
+      width: 100%;
+      max-width: 728px;   /* 요청하신 너비 */
+      aspect-ratio: 728 / 1030; /* 세로 비율 고정 */
+      margin: 100px auto; /* 중앙 정렬 */
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .p6-media-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    /* --- [1] 이미지 스왑 (Sketch -> Final) --- */
+    .p6-media-container .img-front {
+      z-index: 10;
+      opacity: 1;
+    }
+    .p6-media-container .img-back {
+      z-index: 20;
+      opacity: 0;
+    }
+    .p6-media-container:hover .img-back {
+      opacity: 1;
+    }
+
+    /* --- [2] 비디오 호버 (Stop -> Move) --- */
+    .p6-media-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 30;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .p6-media-container:hover video {
+      opacity: 1;
+    }
+
+    /* --- Project 7 Style --- */
+    /* 중앙의 큰 세로 이미지 (1588x2270) */
+    .p7-large-image-container {
+      width: 100%;
+      max-width: 1400px; /* 최대 너비 제한 */
+      aspect-ratio: 1588 / 2270; /* 세로 비율 고정 */
+      margin: 100px auto; /* 중앙 정렬 */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    .p7-large-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* --- Project 8 Style --- */
+    /* 2열 그리드 컨테이너 */
+    .p8-grid-container {
+      width: 100%;
+      max-width: 1400px; /* 전체 그리드의 적절한 최대 너비 설정 (조절 가능) */
+      margin: 100px auto; /* 중앙 정렬 */
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2열 */
+      gap: 15px; /* 이미지 사이 간격 */
+    }
+
+    /* 1~8번 이미지 아이템 (2149x755) */
+    .p8-grid-item {
+      width: 100%;
+      aspect-ratio: 2149 / 755; /* 가로 비율 고정 */
+    }
+
+    .p8-grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 9번 이미지: 2열을 모두 차지하는 전체 너비 아이템 (4338x1525) */
+    .p8-full-span {
+      grid-column: span 2; /* 2칸 차지 */
+      aspect-ratio: 4338 / 1525; /* 마지막 이미지의 비율 */
+      margin-top: 15px; /* 위쪽 그리드와의 간격 (gap과 별도로 추가) */
+    }
+
+    /* 모바일 대응: Project 8 그리드를 1열로 변경 */
+    @media (max-width: 768px) {
+      .p8-grid-container {
+        grid-template-columns: 1fr;
+      }
+      .p8-full-span {
+        grid-column: span 1;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="thumb-row">
+      <div class="thumb" data-target="project1"><span class="label"></span></div>
+      <div class="thumb" data-target="project2"><span class="label"></span></div>
+      <div class="thumb" data-target="project3"><span class="label"></span></div>
+      <div class="thumb" data-target="project4"><span class="label"></span></div>
+      <div class="thumb" data-target="project5"><span class="label"></span></div>
+      <div class="thumb" data-target="project6"><span class="label"></span></div>
+      <div class="thumb" data-target="project7"><span class="label"></span></div>
+      <div class="thumb" data-target="project8"><span class="label"></span></div>
+    </nav>
+      <div class="keywords">
+      <span id="kw-motion">Motion Graphics</span>
+      <span id="kw-3d" style="margin-left: 10px;" >3D Graphic Design</span>
+      <span id="kw-char" style="margin-left: -10px;" >Character Design</span>
+      <span id="kw-illust">Illustration</span>
+    </div>
+    <div class="side-buttons">
+      <button class="side-btn" data-target="contact">Contact</button>
+      <button class="side-btn" data-target="about">About</button>
+    </div>
+  </header>
+
+  <main class="content-wrap">
+  <section id="home" class="page active locked">
+  <div id="sticker" style="
+      position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%);
+      width: 1300px; height: 1300px;
+      z-index: 5; opacity: 1; pointer-events: auto; cursor: pointer;
+      transition: opacity 0.3s ease-out; animation: float 3s ease-in-out infinite;
+      
+      backface-visibility: hidden; 
+      -webkit-backface-visibility: hidden;
+      will-change: transform;
+      
+      overflow: hidden;
+      ">
+        <div class="click-hint">Click!</div> 
+
+        <video src="P_logo.mp4" autoplay loop muted playsinline 
+               style="width: 100%; height: 100%; object-fit: contain;
+                      transform: scale(1.2);"></video>
+    </div>
+
+    <div id="video-container" style="background:#FFFFFF; text-align: center; position: relative; overflow: hidden;">
+      <video id="hero-video" src="reel.mp4" autoplay loop playsinline></video>
+    </div>
+    
+    <div style="height: 100px;"></div>
+
+    <div class="project-detail-3col">
+        <div class="p1-img-stack">
+            <img src="contact_visual.jpg" alt="Profile" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=Contact+Visual'">
+        </div>
+
+        <div class="p1-text-col" id="contact-section">
+            <div>
+                <span class="highlight-green">Contact</span>
+                <p>
+                    kkjh30207@gmail.com<br>
+                    Instagram @h_cam_bers
+                </p>
+            </div>
+        </div>
+
+        <div class="p1-text-col" id="about-section">
+            <div>
+                <span class="highlight-green">About</span>
+                <p>
+                    Visual Designer.<br>
+                    JeongHyeon Kim
+                </p>
+            <div class="tool-box">
+                <span class="tool-title">Tool Skill</span>
+                <div class="tool-list">
+                    <div class="tool-item">
+                        <span class="tool-name">Adobe Illustration</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-name">Adobe Photoshop</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 70%;"></div></div>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-name">Adobe Indesign</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-name">Adobe After Effects</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-name">Cinema 4D</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-name">Blender</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 55%;"></div></div>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-name">Figma</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 200px;"></div>
+  </section>
+  
+<section id="project1" class="page">
+    <div class="project-detail-3col">
+      <div class="p1-img-stack">
+         <img src="project1/curtain1.jpg" alt="Curtain 1" onerror="this.src='https://via.placeholder.com/600x800/1a2a1a/fff?text=Curtain+1'">
+         <img src="project1/curtain2.jpg" alt="Curtain 2" onerror="this.src='https://via.placeholder.com/600x800/4a0000/fff?text=Curtain+2'">
+         <img src="project1/curtain3.jpg" alt="Curtain 3" onerror="this.src='https://via.placeholder.com/600x800/00004a/fff?text=Curtain+3'">
+         <img src="project1/curtain4.jpg" alt="Curtain 4" onerror="this.src='https://via.placeholder.com/600x800/2a002a/fff?text=Curtain+4'">
+      </div>
+      <div class="p1-text-col">
+        <div>
+          <span class="highlight-green">
+            Humans are not the only<br>
+            beings weaving through the<br>
+            past, present, and future.
+          </span>
+          <p style="margin-top: 20px;">
+            Yet, in our modern lives, we often forget this simple truth. 
+            The past held creatures that no longer exist; the present holds life that bridges the ages; 
+            and the future is meant to inherit the life surviving today.
+          </p>
+        </div>
+      </div>
+      <div class="p1-text-col">
+        <div>
+          <p style="margin-top: 800px;">
+            However, humanity shatters this timeless cycle with its own hands. We now possess the power to dismantle species that have built their own worlds. Once extinct, these creatures linger only as remnants, fading away while leaving us with mere fragments to interpret.
+          </p>
+        </div>
+        <div style="margin-top: auto;">
+          <p>
+            On this stage created by man, behold the remnants of what our hands have erased! Cast in the role of 'Human' in this drama, how should we regard our fellow 
+            <span class="word-highlight" data-tooltip="* Deer&#10;* Tiger&#10;* Whale&#10;* Elephant">'Animal'</span> performers?
+          </p>
+        </div>
+        <div style="margin-top: auto;">
+          <p>
+            We express the project's intention through the element of <span class="word-highlight" data-tooltip="* Dawn&#10;* Noon&#10;* Evening&#10;* Midnight">'Theater'</span>. Theater, being an entirely virtual space created by humanity, provided the perfect medium to represent the animals reduced to remnants by human  hands.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mindmap-section">
+        <svg class="mindmap-svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+            <g class="center-node-trigger-group" transform="translate(600, 450)"> <circle r="100" /> </g>
+            <g class="branch-group branch-left">
+                <path class="mindmap-path" d="M 600 450 L 350 600 L 350 670" />
+                <g class="leaf-node-group" transform="translate(350, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="-20" text-anchor="end" style="font-size: 20px;">TIME</text> </g>
+                <g class="leaf-node-group" transform="translate(350, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="-20" text-anchor="end">DAWN</text> </g>
+            </g>
+            <g class="branch-group branch-right-top">
+                <path class="mindmap-path" d="M 600 450 L 850 300 L 850 230" />
+                <g class="leaf-node-group" transform="translate(850, 300)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">ANCIENT ANIMAL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 230)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">CERVIDAE STELLA</text> </g>
+            </g>
+            <g class="branch-group branch-right-bottom">
+                <path class="mindmap-path" d="M 600 450 L 850 600 L 850 880" />
+                <g class="leaf-node-group" transform="translate(850, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">APPEARANCE</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">A RISING FORM ABOVE THE HEAD</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 740)" style="transition-delay: 0.8s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">A TRAILING TAIL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 810)" style="transition-delay: 1.0s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">FOSSIL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 880)" style="transition-delay: 1.1s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">LONG LEGS</text> </g>
+            </g>
+            <g class="center-node-visual-group" transform="translate(600, 450)">
+                <circle class="visual-circle" r="100" />
+                <text class="center-node-text">DEER</text>
+            </g>
+        </svg>
+    </div>
+
+    <div class="p1-hover-media">
+        <img src="project1/deer.jpg" alt="Deer Image">
+        <video src="project1/deer.mp4" loop muted playsinline></video>
+    </div>
+
+    <div style="height: 150px;"></div>
+
+
+    <div class="mindmap-section">
+        <svg class="mindmap-svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+            <g class="center-node-trigger-group" transform="translate(600, 450)"> <circle r="100" /> </g>
+            <g class="branch-group branch-left">
+                <path class="mindmap-path" d="M 600 450 L 350 600 L 350 670" />
+                <g class="leaf-node-group" transform="translate(350, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="-20" text-anchor="end" style="font-size: 20px;">TIME</text> </g>
+                <g class="leaf-node-group" transform="translate(350, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="-20" text-anchor="end">NOON</text> </g>
+            </g>
+            <g class="branch-group branch-right-top">
+                <path class="mindmap-path" d="M 600 450 L 850 300 L 850 230" />
+                <g class="leaf-node-group" transform="translate(850, 300)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">ANCIENT ANIMAL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 230)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">PANTHERA TIGRIS AMETHYSTUS</text> </g>
+            </g>
+            <g class="branch-group branch-right-bottom">
+                <path class="mindmap-path" d="M 600 450 L 850 600 L 850 950" />
+                <g class="leaf-node-group" transform="translate(850, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">APPEARANCE</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">FOSSIL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 740)" style="transition-delay: 0.8s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">A DEEP INDENTATION</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 810)" style="transition-delay: 1.0s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">MASSIVE BODY</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 880)" style="transition-delay: 1.1s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">THICK LEGS</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 950)" style="transition-delay: 1.2s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">ELONGATED EARS</text> </g>
+            </g>
+            <g class="center-node-visual-group" transform="translate(600, 450)">
+                <circle class="visual-circle" r="100" />
+                <text class="center-node-text">ELEPHANT</text>
+            </g>
+        </svg>
+    </div>
+
+    <div class="p1-hover-media">
+        <img src="project1/elephant.jpg" alt="Elephant Image">
+        <video src="project1/elephant.mp4" loop muted playsinline></video>
+    </div>
+
+    <div style="height: 150px;"></div>
+
+
+    <div class="mindmap-section">
+        <svg class="mindmap-svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+            <g class="center-node-trigger-group" transform="translate(600, 450)"> <circle r="100" /> </g>
+            <g class="branch-group branch-left">
+                <path class="mindmap-path" d="M 600 450 L 350 600 L 350 670" />
+                <g class="leaf-node-group" transform="translate(350, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="-20" text-anchor="end" style="font-size: 20px;">TIME</text> </g>
+                <g class="leaf-node-group" transform="translate(350, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="-20" text-anchor="end">DUSK</text> </g>
+            </g>
+            <g class="branch-group branch-right-top">
+                <path class="mindmap-path" d="M 600 450 L 850 300 L 850 230" />
+                <g class="leaf-node-group" transform="translate(850, 300)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">ANCIENT ANIMAL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 230)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">CETACEA RED MACULA</text> </g>
+            </g>
+            <g class="branch-group branch-right-bottom">
+                <path class="mindmap-path" d="M 600 450 L 850 600 L 850 950" />
+                <g class="leaf-node-group" transform="translate(850, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">APPEARANCE</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">FOSSIL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 740)" style="transition-delay: 0.8s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">MASSIVE MOUTH</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 810)" style="transition-delay: 1.0s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">TWO SHORT FORLIMBS</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 880)" style="transition-delay: 1.1s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">A SINGLE, ELONGATED HIND LIMB</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 950)" style="transition-delay: 1.2s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">PROTRUSIONS RISING FROM THE BACK</text> </g>
+            </g>
+            <g class="center-node-visual-group" transform="translate(600, 450)">
+                <circle class="visual-circle" r="100" />
+                <text class="center-node-text">WHALE</text>
+            </g>
+        </svg>
+    </div>
+
+    <div class="p1-hover-media">
+        <img src="project1/whale.jpg" alt="Whale Image">
+        <video src="project1/whale.mp4" loop muted playsinline></video>
+    </div>
+
+    <div style="height: 150px;"></div>
+
+
+    <div class="mindmap-section">
+        <svg class="mindmap-svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+            <g class="center-node-trigger-group" transform="translate(600, 450)"> <circle r="100" /> </g>
+            <g class="branch-group branch-left">
+                <path class="mindmap-path" d="M 600 450 L 350 600 L 350 670" />
+                <g class="leaf-node-group" transform="translate(350, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="-20" text-anchor="end" style="font-size: 20px;">TIME</text> </g>
+                <g class="leaf-node-group" transform="translate(350, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="-20" text-anchor="end">MIDNIGHT</text> </g>
+            </g>
+            <g class="branch-group branch-right-top">
+                <path class="mindmap-path" d="M 600 450 L 850 300 L 850 230" />
+                <g class="leaf-node-group" transform="translate(850, 300)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">ANCIENT ANIMAL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 230)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">PANTHERA TIGRIS</text> </g>
+            </g>
+            <g class="branch-group branch-right-bottom">
+                <path class="mindmap-path" d="M 600 450 L 850 600 L 850 950" />
+                <g class="leaf-node-group" transform="translate(850, 600)"> <circle class="leaf-node-dot" r="10" /> <text class="leaf-node-text" x="20" text-anchor="start" style="font-size: 20px;">APPEARANCE</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 670)" style="transition-delay: 0.7s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">FOSSIL</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 740)" style="transition-delay: 0.8s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">MASSIVE PAWS</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 810)" style="transition-delay: 1.0s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">SHARP CANINES</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 880)" style="transition-delay: 1.1s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">SUPPLE SPINE</text> </g>
+                <g class="leaf-node-group" transform="translate(850, 950)" style="transition-delay: 1.2s;"> <circle class="leaf-node-dot" r="7" /> <text class="leaf-node-text" x="20" text-anchor="start">LARGE SKELETAL STRUCTURE</text> </g>
+            </g>
+            <g class="center-node-visual-group" transform="translate(600, 450)">
+                <circle class="visual-circle" r="100" />
+                <text class="center-node-text">TIGER</text>
+            </g>
+        </svg>
+    </div>
+
+    <div class="p1-hover-media">
+        <img src="project1/tiger.jpg" alt="Tiger Image">
+        <video src="project1/tiger.mp4" loop muted playsinline></video>
+    </div>
+
+
+    <div style="height:200px; background:#fff;"></div>
+  </section>
+
+
+<section id="project2" class="page">
+      
+      <div class="p2-track">
+        <div class="p2-sticky-container">
+          <div class="project-detail-3col">
+            <div class="p1-img-stack">
+               <div class="p2-img-window">
+                 <img id="p2-long-image" src="project2/long.png" alt="Long Scrolling Image" onerror="this.src='https://via.placeholder.com/300x5000/35FFA1/fff?text=Long+Image'">
+               </div>
+            </div>
+            <div class="p1-text-col">
+              <div>
+                <span class="highlight-green">Earth allows us to breathe, but are we tightening the noose around its neck?</span>
+                <p style="margin-top: 20px;">Environmental pollution often slips beneath our conscious radar, feeling eerily detached from our immediate reality.</p>
+              </div>
+            </div>
+            <div class="p1-text-col">
+              <div style="margin-top: 400px;">
+                <p>his visual metaphor exposes that these scenes are unfolding inside us. It delivers a heavy message: humanity is intrinsic to nature, and our destruction of the environment is, ultimately, an act of self-destruction.</p>
+              </div>
+            </div>
+          </div> 
+        </div> 
+      </div> 
+<div class="project-detail-3col">
+        
+        <div></div>
+
+        <div class="p1-text-col">
+            <div class="scene-gallery">
+              
+              <div class="scene-item">
+                  <img class="scene-visual scene-img" src="project2/scene1.jpg" alt="Scene 1" onerror="this.src='https://via.placeholder.com/1328x2360/eee/333?text=Scene+1'">
+                  <video class="scene-visual scene-video" src="project2/scene1.mp4" loop muted playsinline></video>
+              </div>
+
+              <div class="scene-item">
+                  <img class="scene-visual scene-img" src="project2/scene2.jpg" alt="Scene 2" onerror="this.src='https://via.placeholder.com/1328x2360/eee/333?text=Scene+2'">
+                  <video class="scene-visual scene-video" src="project2/scene2.mp4" loop muted playsinline></video>
+              </div>
+
+              <div class="scene-item">
+                  <img class="scene-visual scene-img" src="project2/scene3.jpg" alt="Scene 3" onerror="this.src='https://via.placeholder.com/1328x2360/eee/333?text=Scene+3'">
+                  <video class="scene-visual scene-video" src="project2/scene3.mp4" loop muted playsinline></video>
+              </div>
+
+            </div>
+        </div>
+
+        <div></div>
+        
+      </div>
+      <div style="height:200px;"></div>
+  </section>
+
+
+    <section id="project3" class="page">
+    
+    <div class="project-detail-3col">
+      
+      <div class="p1-img-stack">
+         <img src="project3/player.jpg" alt="Project 3 Image" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=Project+3+Image'">
+      </div>
+
+      <div class="p1-text-col">
+        <div>
+          <span class="highlight-green">
+            The digital world watches and manipulates us in myriad ways.
+          </span>
+          <p style="margin-top: 20px;">
+            The digital world watches and manipulates us in myriad ways. We are controlled, much like scripted elements in a video game. One day, 'You' awaken to this reality and begin a desperate journey, jumping from world to world to break free. 
+          </p>
+        </div>
+      </div>
+
+      <div class="p1-text-col">
+        <div style="margin-top: 600px;">
+          <p>
+            Are you the master outside the glass, or the avatar inside?
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="p3-wide-image-container">
+        <img src="project3/head.jpg" alt="Wide Banner" onerror="this.src='https://via.placeholder.com/3782x944/eee/333?text=Wide+Image+(3782x944)'">
+    </div>
+
+    <div class="p3-square-image-container">
+        <img src="project3/head2.jpg" alt="Detail Square" onerror="this.src='https://via.placeholder.com/1114x1012/eee/333?text=Square+Image+(1114x1012)'">
+    </div>
+    <div class="p3-grid-container">
+        <div class="p3-grid-item"><img src="project3/scene1.jpg" alt="Scene 1" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+1'"></div>
+        <div class="p3-grid-item"><img src="project3/scene2.jpg" alt="Scene 2" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+2'"></div>
+        <div class="p3-grid-item"><img src="project3/scene3.jpg" alt="Scene 3" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+3'"></div>
+        <div class="p3-grid-item"><img src="project3/scene4.jpg" alt="Scene 4" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+4'"></div>
+        
+        <div class="p3-grid-item"><img src="project3/scene5.jpg" alt="Scene 5" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+5'"></div>
+        <div class="p3-grid-item"><img src="project3/scene6.jpg" alt="Scene 6" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+6'"></div>
+        <div class="p3-grid-item"><img src="project3/scene7.jpg" alt="Scene 7" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+7'"></div>
+        <div class="p3-grid-item"><img src="project3/scene8.jpg" alt="Scene 8" onerror="this.src='https://via.placeholder.com/1639x830/eee/999?text=Scene+8'"></div>
+    </div>
+
+    <div class="p3-center-media">
+        <img src="project3/scene9.jpg" alt="Scene 9" onerror="this.src='https://via.placeholder.com/1639x830/35FFA1/fff?text=Scene+9'">
+        <video src="project3/scene9.mp4" loop muted playsinline></video>
+    </div>
+
+    <div style="height:200px;"></div>
+  </section>
+
+
+    <section id="project4" class="page">
+    
+    <div class="project-detail-3col">
+        <div class="p1-img-stack">
+            <img src="project4/Bathroom.jpg" alt="Bathroom" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=Bathroom.jpg'">
+        </div>
+
+        <div class="p1-text-col">
+            <div>
+                <span class="highlight-green">
+                    To you, who yearns to leave everything behind.
+                </span>
+                <p style="margin-top: 20px;">
+                    Caught in the chaos of daily life, do you crave a distant sanctuary yet find yourself bound by time? If so, fill the white square with water and submerge 'Tonight' within it.
+                </p>
+            </div>
+        </div>
+
+        <div class="p1-text-col">
+            <div style="margin-top: 500px;">
+                <p>
+                    After a moment of silence, the mundane bathroom fades away. In its place, a universe expands, trees rise, and an ocean swells. Your journey begins right here.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p4-tall-image-container">
+        <img src="project4/bomb.png" alt="Bomb Tall Image" onerror="this.src='https://via.placeholder.com/1577x3291/35FFA1/fff?text=bomb.png'">
+    </div>
+
+    <div class="p4-grid-container">
+        
+        <div class="p4-swap-item">
+            <img class="img-front" src="project4/bomb1.jpg" alt="bomb1" onerror="this.src='https://via.placeholder.com/1368x2248/eee/333?text=bomb1'">
+            <img class="img-back" src="project4/Bathbomb.jpg" alt="Bathbomb" onerror="this.src='https://via.placeholder.com/1368x2248/35FFA1/fff?text=Bathbomb'">
+        </div>
+
+        <div class="p4-swap-item">
+            <img class="img-front" src="project4/bomb2.jpg" alt="bomb2" onerror="this.src='https://via.placeholder.com/1368x2248/eee/333?text=bomb2'">
+            <img class="img-back" src="project4/Bathbomb2.jpg" alt="Bathbomb2" onerror="this.src='https://via.placeholder.com/1368x2248/35FFA1/fff?text=Bathbomb2'">
+        </div>
+
+        <div class="p4-swap-item">
+            <img class="img-front" src="project4/bomb3.jpg" alt="bomb3" onerror="this.src='https://via.placeholder.com/1368x2248/eee/333?text=bomb3'">
+            <img class="img-back" src="project4/Bathbomb3.jpg" alt="Bathbomb3" onerror="this.src='https://via.placeholder.com/1368x2248/35FFA1/fff?text=Bathbomb3'">
+        </div>
+
+        <div class="p4-swap-item">
+            <img class="img-front" src="project4/bomb4.jpg" alt="bomb4" onerror="this.src='https://via.placeholder.com/1368x2248/eee/333?text=bomb4'">
+            <img class="img-back" src="project4/Bathbomb4.jpg" alt="Bathbomb4" onerror="this.src='https://via.placeholder.com/1368x2248/35FFA1/fff?text=Bathbomb4'">
+        </div>
+
+    </div>
+
+    <div style="height:200px;"></div>
+</section>
+
+
+    <section id="project5" class="page">
+    
+    <div class="project-detail-3col">
+        <div class="p1-img-stack">
+            <img src="project5/frogy.jpg" alt="Frogy" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=frogy.jpg'">
+        </div>
+
+        <div class="p1-text-col">
+            <div>
+                <span class="highlight-green">
+                    Frogy!
+                </span>
+                <p style="margin-top: 20px;">
+                    Below you can see the transition from the rough sketch to the final illustration, and the motion test.
+                </p>
+            </div>
+        </div>
+
+        <div class="p1-text-col">
+            <div style="margin-top: 200px;">
+                <p>
+              
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p5-media-container">
+        <img class="img-front" src="project5/sketch.png" alt="Sketch" onerror="this.src='https://via.placeholder.com/1920x1080/eee/333?text=sketch.jpg'">
+        <img class="img-back" src="project5/final.jpg" alt="Final" onerror="this.src='https://via.placeholder.com/1920x1080/35FFA1/fff?text=final.jpg'">
+    </div>
+
+    <div class="p5-media-container">
+        <img src="project5/stop.jpg" alt="Stop Frame" onerror="this.src='https://via.placeholder.com/1920x1080/eee/333?text=stop.jpg'">
+        <video src="project5/move.mp4" loop muted playsinline></video>
+    </div>
+
+    <div style="height:200px;"></div>
+</section>
+
+
+    <section id="project6" class="page">
+    
+    <div class="project-detail-3col">
+        <div class="p1-img-stack">
+            <img src="project6/yolong.jpg" alt="Yolong" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=yolong.jpg'">
+        </div>
+
+        <div class="p1-text-col">
+            <div>
+                <span class="highlight-green">
+                    Yolong, What are you doing now?
+                </span>
+                <p style="margin-top: 20px;">
+                    Below you can see the transition from the rough sketch to the final illustration, and the motion test.
+                </p>
+            </div>
+        </div>
+
+        <div class="p1-text-col">
+            <div style="margin-top: 200px;">
+                <p>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p6-media-container">
+        <img class="img-front" src="project6/sketch.jpg" alt="Sketch" onerror="this.src='https://via.placeholder.com/728x1030/eee/333?text=sketch.jpg'">
+        <img class="img-back" src="project6/final.jpg" alt="Final" onerror="this.src='https://via.placeholder.com/728x1030/35FFA1/fff?text=final.jpg'">
+    </div>
+
+    <div class="p6-media-container">
+        <img src="project6/stop.jpg" alt="Stop Frame" onerror="this.src='https://via.placeholder.com/728x1030/eee/333?text=stop.jpg'">
+        <video src="project6/move.mp4" loop muted playsinline></video>
+    </div>
+
+    <div style="height:200px;"></div>
+</section>
+
+
+    <section id="project7" class="page">
+    <div class="project-detail-3col">
+        <div class="p1-img-stack">
+            <img src="project7/under.jpg" alt="Under" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=under.jpg'">
+        </div>
+
+        <div class="p1-text-col">
+            <div>
+                <span class="highlight-green">
+                    monster, 
+                </span>
+                <p style="margin-top: 20px;">
+                    Project description goes here.<br>
+                    Explanation about the illustration style and concept.
+                </p>
+            </div>
+        </div>
+
+        <div class="p1-text-col">
+            <div style="margin-top: 200px;">
+                <p>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p7-large-image-container">
+        <img src="project7/monster.jpg" alt="Monster" onerror="this.src='https://via.placeholder.com/1588x2270/35FFA1/fff?text=monster.jpg'">
+    </div>
+
+    <div style="height:200px;"></div>
+</section>
+
+
+<section id="project8" class="page">
+    <div class="project-detail-3col">
+        <div class="p1-img-stack">
+            <img src="project8/travel.jpg" alt="Travel" onerror="this.src='https://via.placeholder.com/600x800/eee/999?text=travel.jpg'">
+        </div>
+
+        <div class="p1-text-col">
+            <div>
+                <span class="highlight-green">
+                    The Little Wanderer
+                </span>
+                <p style="margin-top: 20px;">
+                    A collection of travel photographs capturing moments and landscapes.
+                </p>
+            </div>
+        </div>
+
+        <div class="p1-text-col">
+            <div style="margin-top: 200px;">
+                <p>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p8-grid-container">
+        <div class="p8-grid-item"><img src="project8/1.jpg" alt="Travel 1" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=1.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/2.jpg" alt="Travel 2" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=2.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/3.jpg" alt="Travel 3" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=3.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/4.jpg" alt="Travel 4" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=4.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/5.jpg" alt="Travel 5" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=5.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/6.jpg" alt="Travel 6" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=6.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/7.jpg" alt="Travel 7" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=7.jpg'"></div>
+        <div class="p8-grid-item"><img src="project8/8.jpg" alt="Travel 8" onerror="this.src='https://via.placeholder.com/2149x755/eee/333?text=8.jpg'"></div>
+        
+        <div class="p8-grid-item p8-full-span">
+            <img src="project8/9.jpg" alt="Travel 9" onerror="this.src='https://via.placeholder.com/4338x1525/35FFA1/fff?text=9.jpg (Full Width)'">
+        </div>
+    </div>
+
+    <div style="height:200px;"></div>
+</section>
+
+
+  </main>
+
+<script>
+    const thumbs = document.querySelectorAll('.thumb');
+    const sideBtns = document.querySelectorAll('.side-btn');
+    const pages = document.querySelectorAll('.page');
+    const topbar = document.querySelector('.topbar');
+    const thumbRow = document.querySelector('.thumb-row'); 
+     
+    const keywordGroups = {
+        'kw-motion': ['project1', 'project2'],
+        'kw-3d': ['project3', 'project4'],
+        'kw-char': ['project5', 'project6'],
+        'kw-illust': ['project7', 'project8']
+    };
+    const keywords = document.querySelectorAll('.keywords span');
+    const allProjectIds = Object.values(keywordGroups).flat();
+     
+    let currentHoverGroup = null; 
+
+    function setThumbVisibility(targetIds, isVisible) {
+        thumbs.forEach(thumb => {
+            const isTarget = targetIds.includes(thumb.dataset.target);
+            const isActive = thumb.classList.contains('active');
+
+            if (isActive) {
+                thumb.classList.add('visible');
+            } 
+            else if (isTarget && isVisible) {
+                thumb.classList.add('visible');
+            } 
+            else {
+                thumb.classList.remove('visible');
+            }
+        });
+    }
+
+    function setActive(targetId) {
+        currentHoverGroup = null; 
+
+        const heroVideo = document.getElementById('hero-video'); 
+        
+        // 특정 비디오 하나만 잡는 게 아니라, 모든 프로젝트 비디오를 일시정지 시킴
+        const allProjectVideos = document.querySelectorAll('.project-video');
+        allProjectVideos.forEach(v => {
+            v.pause();
+            v.currentTime = 0;
+        });
+
+        if (heroVideo) {
+            heroVideo.pause();
+            heroVideo.currentTime = 0;
+        }
+
+        if (targetId === 'home') {
+            if (heroVideo) heroVideo.play().catch(e => console.log(e));
+        }
+        else if (targetId === 'project1') {
+            // 프로젝트 1에 들어왔을 때 첫 번째 비디오만 자동 재생하거나, 
+            // 원하시면 다 켜둘 수도 있지만 일단 첫 번째 것만 재생 시도
+            const firstP1Video = document.getElementById('project1-video');
+            if (firstP1Video) firstP1Video.play().catch(e => console.log(e));
+        }
+        
+        thumbs.forEach(t => t.classList.remove('active'));
+        sideBtns.forEach(b => b.classList.remove('active'));
+        pages.forEach(p => p.classList.remove('active'));
+
+        const targetThumb = document.querySelector(`.thumb[data-target="${targetId}"]`);
+        const targetSideBtn = document.querySelector(`.side-btn[data-target="${targetId}"]`);
+        const targetPage = document.getElementById(targetId);
+
+        if (targetThumb) targetThumb.classList.add('active');
+        if (targetSideBtn) targetSideBtn.classList.add('active');
+        if (targetPage) targetPage.classList.add('active');
+
+        setThumbVisibility(allProjectIds, false); 
+
+        if (targetPage) targetPage.scrollTo(0, 0);
+    }
+
+    thumbs.forEach(t => t.addEventListener('click', () => setActive(t.dataset.target)));
+
+    sideBtns.forEach(b => b.addEventListener('click', () => {
+        const target = b.dataset.target;
+        
+        if (target === 'contact' || target === 'about') {
+            if (!document.getElementById('home').classList.contains('active')) {
+                setActive('home');
+            }
+            
+            setTimeout(() => {
+                const sectionId = target + '-section'; 
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+
+            sideBtns.forEach(btn => btn.classList.remove('active'));
+            b.classList.add('active');
+        } 
+        else {
+            setActive(target);
+        }
+    }));
+
+    thumbs.forEach(thumb => {
+        const targetId = thumb.dataset.target;
+
+        thumb.addEventListener('mouseenter', () => {
+            currentHoverGroup = null; 
+            setThumbVisibility([targetId], true);
+        });
+
+        thumb.addEventListener('mouseleave', () => {
+             if (!thumb.classList.contains('active')) {
+                 thumb.classList.remove('visible');
+             }
+        });
+    });
+
+    keywords.forEach(keyword => {
+        const targetKey = keyword.id;
+        const targetProjects = keywordGroups[targetKey];
+        if (targetProjects) {
+            keyword.addEventListener('mouseenter', () => {
+                currentHoverGroup = targetProjects; 
+                setThumbVisibility(currentHoverGroup, true); 
+            });
+        }
+    });
+     
+    topbar.addEventListener('mouseleave', (e) => {
+        currentHoverGroup = null; 
+        setThumbVisibility(allProjectIds, false);
+    });
+
+    setActive('home');
+
+    const heroVideo = document.getElementById('hero-video');
+    const sticker = document.getElementById('sticker');
+    const homeSection = document.getElementById('home'); 
+
+    function handleInitialInteraction() {
+        if (sticker) {
+            sticker.style.opacity = '0';
+            sticker.style.pointerEvents = 'none'; 
+        }
+        
+        if (homeSection) {
+            homeSection.classList.remove('locked');
+        }
+
+        if (heroVideo && homeSection && homeSection.classList.contains('active')) {
+            heroVideo.play().catch(e => console.log(e));
+        }
+
+        document.body.removeEventListener('click', handleInitialInteraction);
+        document.body.removeEventListener('keydown', handleInitialInteraction);
+    }
+
+    if (sticker) {
+        document.body.addEventListener('click', handleInitialInteraction, { once: true });
+        document.body.addEventListener('keydown', handleInitialInteraction, { once: true });
+    }
+
+    const stickerDiv = document.getElementById('sticker');
+    const clickHint = document.querySelector('.click-hint');
+
+    if (stickerDiv && clickHint) {
+        stickerDiv.addEventListener('mousemove', (e) => {
+            // 마우스 커서(png) 크기를 고려하여 약간 오른쪽 아래에 위치시킴
+            // X좌표 + 30px, Y좌표 + 10px (원하는 대로 숫자 조절 가능)
+            clickHint.style.left = (e.clientX + -290) + 'px';
+            clickHint.style.top = (e.clientY + 100) + 'px';
+        });
+    }
+
+    // [수정된 부분] 모든 프로젝트 비디오에 대해 클릭 시 재생/일시정지 기능 추가
+    const projectVideos = document.querySelectorAll('.project-video');
+    projectVideos.forEach(video => {
+        video.addEventListener('click', function() {
+            if (this.paused) {
+                this.play();
+            } else {
+                this.pause();
+            }
+        });
+    });
+
+    // --- Project 2 : Long Image Scroll Logic ---
+    const p2Page = document.getElementById('project2');
+    const p2Track = document.querySelector('.p2-track');
+    const p2Sticky = document.querySelector('.p2-sticky-container');
+    const longImg = document.getElementById('p2-long-image');
+    const imgWindow = document.querySelector('.p2-img-window');
+
+    if (p2Page && p2Track && longImg && imgWindow) {
+        p2Page.addEventListener('scroll', () => {
+            // 1. 현재 트랙의 위치 정보를 가져옴
+            const trackRect = p2Track.getBoundingClientRect();
+            const stickyRect = p2Sticky.getBoundingClientRect();
+            
+            // 2. 트랙이 화면 상단에 닿은 시점부터 계산 시작
+            // (Sticky가 고정된 상태에서 스크롤 된 거리)
+            let scrollDistance = -trackRect.top + stickyRect.top; 
+
+            // 3. 전체 스크롤 가능한 거리 (트랙 높이 - 화면 높이)
+            const maxScroll = p2Track.offsetHeight - window.innerHeight;
+
+            // 4. 진행률 (0.0 ~ 1.0)
+            let progress = scrollDistance / maxScroll;
+            
+            // 범위 제한 (0~1 사이)
+            if (progress < 0) progress = 0;
+            if (progress > 1) progress = 1;
+
+            // 5. 이미지가 움직여야 할 전체 거리 (이미지 높이 - 보여지는 창 높이)
+            // 이미지가 창보다 작으면 움직일 필요 없음
+            if (longImg.offsetHeight > imgWindow.offsetHeight) {
+                const moveRange = longImg.offsetHeight - imgWindow.offsetHeight;
+                
+                // 6. 진행률에 맞춰 이미지 Y축 이동 (위로 올라가야 하므로 마이너스)
+                // "하단에서 상단으로"라면 이미지가 아래에서 위로 훑고 지나가야 함
+                longImg.style.transform = `translateY(${-moveRange * (1 - progress)}px)`;
+            }
+        });
+    }
+
+// --- Scene Gallery & Hover Video Interaction (Unified) ---
+    // [수정됨] .p6-media-container 추가
+    const interactiveItems = document.querySelectorAll('.scene-item, .p1-hover-media, .p3-center-media, .p5-media-container, .p6-media-container');
+
+    interactiveItems.forEach(item => {
+        const video = item.querySelector('video');
+        
+        if(video) {
+            item.addEventListener('mouseenter', () => {
+                video.play().catch(e => console.log(e)); 
+            });
+            item.addEventListener('mouseleave', () => {
+                video.pause();
+                video.currentTime = 0; 
+            });
+        }
+    });
+
+</script>
+</body>
+</html>
